@@ -9,9 +9,8 @@ const Grid = function (cols, rows) {
     console.log('grid init');
     this.cells = [];
     for (let i = 0; i < this.x; i++) {
-      this.cells.push([]);
       for (let j = 0; j < this.y; j++) {
-        this.cells[i].push(new Cell(i, j, this));
+        (i % 2 == j % 2) && this.cells.push(new Cell(i,j,this));
       }
     }
   }
@@ -20,11 +19,16 @@ const Grid = function (cols, rows) {
 
   this.draw = function () {
     console.log('grid draw');
-    for(let i = 0; i < this.x; i++) {
-      for(let j = 0; j < this.y; j++) {
-        this.cells[i][j].draw();
-      }
+    for(let cell of this.cells) {
+      cell.draw();
     }
+  }
+
+  this.get_cell = function(x,y) {
+    for(let cell of this.cells) {
+      if(cell.x == x && cell.y == y) return cell;
+    }
+    return undefined;
   }
 }
 

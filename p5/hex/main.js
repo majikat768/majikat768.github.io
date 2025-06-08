@@ -4,7 +4,7 @@
  */
 
 import sketch from './sketch.js';
-import { p5ctx, setContext } from './const.js';
+import { setContext } from './const.js';
 
 setContext(new p5(sketch));
 

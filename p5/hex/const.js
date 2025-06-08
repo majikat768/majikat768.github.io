@@ -1,6 +1,6 @@
 const cell_size = 12;
-const column_count = 64;
-const row_count = 48;
+const column_count = 48;
+const row_count = 64;
 const screenW = cell_size * column_count;
 const screenH = cell_size * row_count;
 
@@ -18,13 +18,42 @@ const hexHdist = 3 / 4 * hexWidth;
 
 const vertices = [];
 
+const angles = [
+  30,
+  90,
+  150,
+  210,
+  270,
+  330
+]
+
+const angle2direction = {
+  30:{x:1,y:-1},
+  90:{x:0,y:-2},
+  150:{x:-1,y:-1},
+  210:{x:-1,y:1},
+  270:{x:0,y:2},
+  330:{x:1,y:1}
+}
+const direction2angle = function(x,y) {
+  if(x > 0) {
+    if(y > 0) return 330;
+    return 30;
+  } else if(x < 0) {
+    if(y > 0) return 210;
+    return 150;
+  }
+  if(y > 0) return 270;
+  return 90;
+}
+
 const neighbor_directions = [
-  {x:-1,y:0},
-  {x:0,y:-1},
-  {x:1,y:0},
-  // {x:1,y:-1},
-  {x:0,y:1},
-  // {x:-1,y:-1},
+  {x:-1,y:-1},
+  {x:1,y:-1},
+  {x:-1,y:1},
+  {x:1,y:1},
+  {x:0,y:2},
+  {x:0,y:-2},
 ];
 
 const p5ctx = {};
@@ -40,6 +69,9 @@ const setContext = (p) => {
 } 
 
 export {
+  angles,
+  angle2direction,
+  direction2angle,
   hexVdist,
   hexHdist,
   hexWidth,

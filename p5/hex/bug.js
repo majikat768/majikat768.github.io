@@ -1,4 +1,4 @@
-import { column_count, neighbor_directions, p5ctx, row_count } from "./const.js";
+import { angle2direction, angles, column_count, direction2angle, neighbor_directions, p5ctx, row_count } from "./const.js";
 
 const Bug = function (cell) {
   this.current_cell = cell;
@@ -10,6 +10,7 @@ const Bug = function (cell) {
 ]
   this.cells = [cell];
 
+  this.current_angle = angles[Math.floor(Math.random()*angles.length)];
   this.done = false;
 
   this.draw = function () {
@@ -33,28 +34,37 @@ const Bug = function (cell) {
   this.find_next_cell = function () {
     if(this.done) return;
     if(this.current_cell == undefined) return;
-    let grid = this.current_cell.grid.cells;
+    let grid = this.current_cell.grid;
     let possible = [];
-    let directions = [ ...neighbor_directions ];
-    if(this.current_cell.x %2 == 0) {
-      directions.push({x:-1,y:1});
-      directions.push({x:1,y:1});
-    } else {
-      directions.push({x:-1,y:-1});
-      directions.push({x:1,y:-1});
+    let next_angles = []
+    for(let a of angles) {
+      if(a != this.current_angle) next_angles.push(a);
     }
+    // let next_angles = [
+    //   // this.current_angle,
+    //   this.current_angle > 30 ? this.current_angle-60 : 330,
+    //   this.current_angle < 330 ? this.current_angle+60 : 30,
+    // ]
+    // next_angles = [
+    //   ...next_angles,
+    //   next_angles[1] > 30 ? next_angles[1] - 60 : 330,
+    //   next_angles[2] < 330 ? next_angles[2] + 60 : 30,
+    // ]
+    // let next_angles = angles;
 
-    for (let d of directions) {
+    for (let a of next_angles) {
+      let d = angle2direction[a];
       let nextX = this.current_cell.x + d.x;
       let nextY = this.current_cell.y + d.y;
       if (nextX >= 0 && nextX < column_count && nextY >= 0 && nextY < row_count) {
-        let nextCell = grid[nextX][nextY];
-        if (!nextCell.visited) {
-          possible.push(grid[nextX][nextY]);
+        let nextCell = grid.get_cell(nextX,nextY);
+        if (!nextCell.visited || nextCell.visits > 0) {
+          possible.push(nextCell);
         }
       }
     }
       if (possible.length > 0) {
+        // let next = possible[0];
         let next = possible[Math.floor(Math.random() * possible.length)];
         p5ctx.context.stroke(this.color);
         p5ctx.context.line(this.current_cell.screenX,this.current_cell.screenY,next.screenX,next.screenY)
@@ -63,7 +73,8 @@ const Bug = function (cell) {
         p5ctx.context.fill(255,255,255)
         p5ctx.context.circle(this.current_cell.screenX, this.current_cell.screenY, 8);
         this.cells.push(next);
-        next.visited = true;
+        this.current_angle = direction2angle(next.x - this.current_cell.x,next.y - this.current_cell.y);
+        next.visit();
       } else if(this.cells.length > 0) {
         // this.current_cell.visited = false;
         this.current_cell = this.cells.pop();
@@ -73,7 +84,7 @@ const Bug = function (cell) {
         // this.current_cell = this.cells[this.cells.indexOf(this.current_cell)-1];
         // this.cells.push(this.current_cell)
       } else {
-        this.done == true;
+        this.done = true;
       }
   }
 }
